@@ -6,7 +6,7 @@ import time
 
 PORT     = "COM10"
 BAUD     = 921600
-LABEL    = "green5"
+LABEL    = "hello"   # one run per label; use only letters, digits, space, "-" and "_"
 SAVE_DIR = "recordings"
 
 os.makedirs(f"{SAVE_DIR}/{LABEL}", exist_ok=True)
@@ -46,7 +46,8 @@ def record_one():
         print("[WARN] Incomplete data, skipping...")
         return
 
-    filename = f"{SAVE_DIR}/{LABEL}/{LABEL}_{count:04d}.wav"
+    # Edge Impulse takes the label from the file name up to the first '.', so the label must not contain one
+    filename = f"{SAVE_DIR}/{LABEL}/{LABEL}.{count:04d}.wav"
     with open(filename, 'wb') as f:
         f.write(header)
         f.write(data)

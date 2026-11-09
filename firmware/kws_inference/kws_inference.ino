@@ -29,6 +29,15 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 static int16_t *record_buffer = nullptr;
 static bool debug_nn = false;
 
+// 24-bit sample in the top of a 32-bit word -> shift right 14 -> clamp to int16.
+// Without the clamp, a loud input above about -12 dBFS would wrap around to the opposite sign.
+static inline int16_t to_int16(int32_t raw) {
+    int32_t v = raw >> 14;
+    if (v > INT16_MAX) return INT16_MAX;
+    if (v < INT16_MIN) return INT16_MIN;
+    return (int16_t)v;
+}
+
 static bool i2s_init() {
     i2s_config_t i2s_config = {
         .mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX),
@@ -79,7 +88,7 @@ static void record_one_second() {
                   &bytes_read, portMAX_DELAY);
         int samples = bytes_read / sizeof(int32_t);
         for (int i = 0; i < samples && collected < total_samples; i++) {
-            record_buffer[collected++] = (int16_t)(raw32[i] >> 14);
+            record_buffer[collected++] = to_int16(raw32[i]);
         }
     }
 
@@ -116,32 +125,44 @@ static void led_set(bool r, bool y, bool g) {
     digitalWrite(LED_GREEN,  g ? HIGH : LOW);
 }
 
+// Set only when the buffer and the microphone are ready. loop() does nothing until then.
+static bool system_ready = false;
+
+static void init_failed(const char* msg) {
+    Serial.printf("ERR: %s\n", msg);
+    oled_show("Error!", msg);
+    led_set(true, true, true);   // all three LEDs on = init failure
+}
+
 void setup() {
     Serial.begin(115200);
     esp_log_level_set("*", ESP_LOG_NONE);
     pinMode(BUTTON_PIN, INPUT);   // pressed = LOW
 
-    record_buffer = (int16_t*)malloc(EI_CLASSIFIER_RAW_SAMPLE_COUNT * sizeof(int16_t));
-    if (!record_buffer) { Serial.println("ERR: not enough RAM"); return; }
-
-    if (!i2s_init()) { Serial.println("ERR: I2S init failed"); return; }
-
-    Serial.println("Ready - press the button to record 1 s");
-
-    Wire.begin(OLED_SDA, OLED_SCL);
-if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
-    Serial.println("ERR: OLED not found");
-} else {
-    oled_show("Ready", "Press to speak");
-    }
-
+    // LEDs and OLED first, so a failure below can be shown on the board
     pinMode(LED_RED, OUTPUT);
     pinMode(LED_YELLOW, OUTPUT);
     pinMode(LED_GREEN, OUTPUT);
     led_set(true, false, false);
+
+    Wire.begin(OLED_SDA, OLED_SCL);
+    if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
+        Serial.println("ERR: OLED not found");   // not fatal: serial output still works
+    }
+
+    record_buffer = (int16_t*)malloc(EI_CLASSIFIER_RAW_SAMPLE_COUNT * sizeof(int16_t));
+    if (!record_buffer) { init_failed("No RAM"); return; }
+
+    if (!i2s_init()) { init_failed("I2S init"); return; }
+
+    oled_show("Ready", "Press to speak");
+    Serial.println("Ready - press the button to record 1 s");
+    system_ready = true;
 }
 
 void loop() {
+    if (!system_ready) { delay(100); return; }
+
     if (digitalRead(BUTTON_PIN) == LOW) {
         delay(30); // debounce
         if (digitalRead(BUTTON_PIN) != LOW) return;

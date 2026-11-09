@@ -4,8 +4,8 @@ Custom board: ESP32-WROOM-32UE, INMP441 I2S microphone, SSD1306 OLED, three stat
 
 ```
 hardware/
-├── schematic/   # KiCad schematic source (add your files)
-├── pcb/         # layout, Gerber, drill, BOM/CPL (add your files)
+├── schematic/AI_Keyword_Spotting.kicad_sch   # KiCad schematic
+├── pcb/AI_Keyword_Spotting.kicad_pcb         # KiCad layout of the fabricated board
 └── README.md
 ```
 
@@ -24,7 +24,7 @@ hardware/
 
 ## Pin mapping
 
-Signal names and GPIOs for the microphone, OLED, flash, buttons and UART come from the schematic table in the report. The LED GPIOs come from the firmware (`kws_inference.ino`), which is what runs on the board.
+Signal names and GPIOs for the microphone, OLED, flash, buttons and UART come from the schematic table in the report. The LED GPIOs come from the firmware (`kws_inference.ino`), which is what runs on the board. In the demo photo of the idle state (`docs/images/10-demo-standby.jpg`) the red LED is lit while the firmware drives IO18, which agrees with the table below. The schematic names IO5 as red and IO18 as yellow, so its LED labels are swapped relative to the board as built (see Known discrepancies).
 
 | Signal | GPIO | Peripheral | Note |
 |---|---|---|---|
@@ -47,6 +47,18 @@ Signal names and GPIOs for the microphone, OLED, flash, buttons and UART come fr
 | TXD0 / RXD0 | IO1 / IO3 | CH340C | To the PC through USB-C |
 
 The dataset capture sketch runs on a different board, the MKE-K01 ESP32-S3 dev kit, with the microphone on WS=6, SCK=5, SD=7.
+
+## Known discrepancies
+
+The board was fabricated and submitted for the course, so these are documented, not changed. The PCB file describes the fabricated board; the schematic file does not match it exactly.
+
+| # | Item | Detail |
+|---|---|---|
+| 1 | LED names | Schematic nets: IO5 = red, IO18 = yellow, IO19 = green. Firmware and the idle photo: IO18 = red, IO5 = yellow, IO19 = green. Use the table above. |
+| 2 | Schematic vs PCB | The schematic (KiCad 10 file) has `J3` (INMP441 header) and `R6` (0 ohm) that the PCB (KiCad 9 file) does not have; the PCB has two 1x3 headers `J4` and `J5` that the schematic lacks. Do not run "Update PCB from Schematic" on these files. |
+| 3 | Missing footprints | `Q1`, `Q2`, `R11` to `R14`, `C12` and `J3` have no footprint assigned in the schematic. |
+| 4 | Flash part value | Schematic `U2` is labelled W25Q128JVE (128 Mbit); the part on the BOM and in the report is W25Q256JVEIQ (256 Mbit). The flash is not used by the firmware. |
+| 5 | Not run | No ERC or DRC result is recorded for these files. |
 
 ## Bring-up sequence
 

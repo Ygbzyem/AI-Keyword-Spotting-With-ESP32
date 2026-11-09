@@ -6,7 +6,9 @@ Usage:
     python tests/check_wav.py a.wav b.wav            # explicit files
 
 FAIL (exit code 1): not PCM, not mono, not 16 kHz, not 16-bit, not exactly 1 s.
-WARN (exit code 0): nearly silent or clipped. Silence is normal for the `noise` label.
+WARN (exit code 0): nearly silent, clipped, or with a large DC offset. Silence is normal for the `noise` label.
+The device removes the DC offset of every 1 s window before inference but the capture sketch does not, so the offset
+reported here shows how far the training clips differ from what the model sees on the board.
 """
 import sys
 import wave
@@ -16,6 +18,7 @@ import array
 RATE, WIDTH, CHANNELS, FRAMES = 16000, 2, 1, 16000
 SILENT_PEAK = 200        # heuristic: peak below this is probably a missed take
 CLIP_FRACTION = 0.01     # heuristic: >1 % of samples at full scale is clipping
+DC_LIMIT = 500           # heuristic: |mean| above this (about -36 dBFS) is worth a look
 
 
 def check(path):
@@ -44,6 +47,9 @@ def check(path):
             warns.append(f"nearly silent (peak={peak})")
         if sum(1 for v in s if abs(v) >= 32767) / len(s) > CLIP_FRACTION:
             warns.append("clipping (>1 % of samples at full scale)")
+        dc = sum(s) / len(s)
+        if abs(dc) > DC_LIMIT:
+            warns.append(f"DC offset {dc:.0f} (device removes it, capture does not)")
     return fails, warns
 
 

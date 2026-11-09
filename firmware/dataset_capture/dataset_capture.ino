@@ -36,6 +36,15 @@ void i2s_init() {
   i2s_zero_dma_buffer(I2S_PORT);
 }
 
+// 24-bit sample in the top of a 32-bit word -> shift right 14 -> clamp to int16.
+// Same conversion as kws_inference.ino. Without the clamp, a loud input would wrap to the opposite sign.
+static inline int16_t to_int16(int32_t raw) {
+  int32_t v = raw >> 14;
+  if (v > INT16_MAX) return INT16_MAX;
+  if (v < INT16_MIN) return INT16_MIN;
+  return (int16_t)v;
+}
+
 void recordAndSend() {
   int32_t raw[512];
   size_t bytes_read;
@@ -56,7 +65,7 @@ void recordAndSend() {
     i2s_read(I2S_PORT, raw, to_read * 4, &bytes_read, portMAX_DELAY);
     int got = bytes_read / 4;
     for (int i = 0; i < got && collected < SAMPLES_PER_CHUNK; i++) {
-      buffer[collected++] = (int16_t)(raw[i] >> 14);
+      buffer[collected++] = to_int16(raw[i]);
     }
   }
 

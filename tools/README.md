@@ -18,4 +18,4 @@ Edit the constants at the top first:
 | `LABEL` | Class being recorded, one run per label |
 | `SAVE_DIR` | Output folder, default `recordings` |
 
-Hold SPACE to record one 1 s clip, release when done, press ESC to quit. Clips are saved as `recordings/<LABEL>/<LABEL>_NNNN.wav`. The `keyboard` package needs administrator rights on Windows and `sudo` on Linux.
+Hold SPACE to record one 1 s clip, release when done, press ESC to quit. Clips are saved as `recordings/<LABEL>/<LABEL>.NNNN.wav`. Edge Impulse reads the label from the file name up to the first `.`, so `hello.0000.wav` is labelled `hello`. Keep `LABEL` to letters, digits, space, `-` and `_`. The `keyboard` package needs administrator rights on Windows and `sudo` on Linux.

@@ -4,7 +4,7 @@ All audio was recorded with the project's own microphone. Raw `.wav` files are n
 
 ```
 Capture chain
-INMP441 -> ESP32-S3 dev kit (MKE-K01, dataset_capture.ino) --USB serial 921600--> PC (tools/capture_audio.py) -> recordings/<label>/<label>_NNNN.wav
+INMP441 -> ESP32-S3 dev kit (MKE-K01, dataset_capture.ino) --USB serial 921600--> PC (tools/capture_audio.py) -> recordings/<label>/<label>.NNNN.wav
 ```
 
 ## Labels (22 classes, noise included)

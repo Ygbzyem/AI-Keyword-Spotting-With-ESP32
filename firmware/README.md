@@ -13,7 +13,9 @@ firmware/
 | `kws_inference` | Custom ESP32-WROOM-32UE | Record 1 s, run MFE + CNN, show result on OLED and LEDs | Edge Impulse library, `Adafruit GFX Library`, `Adafruit SSD1306` |
 | `dataset_capture` | ESP32-S3 dev kit | On serial byte `R`, stream one 1 s WAV (44-byte header + PCM) at 921600 baud | Nothing extra |
 
-Both use the legacy `driver/i2s.h` API, 16 kHz, 32-bit I2S frames shifted right by 14 bits into 16-bit samples. Pins are `#define`s at the top of each file; the inference pins are listed in `hardware/README.md`.
+The OLED text in the demo photos is the Vietnamese wording of the first build (`San sang` / `Nhan nut de noi`); the sketch in this repository uses the English wording.
+
+Both use the legacy `driver/i2s.h` API, 16 kHz, 32-bit I2S frames shifted right by 14 bits into 16-bit samples with saturation (clamped to the int16 range). Pins are `#define`s at the top of each file; the inference pins are listed in `hardware/README.md`.
 
 ## LED behavior in `kws_inference`
 
@@ -23,4 +25,4 @@ Both use the legacy `driver/i2s.h` API, 16 kHz, 32-bit I2S frames shifted right 
 | Recording and recognizing | Yellow | `Recording...` then `Recognizing...` |
 | Result | Green (red or yellow if the label is `red` or `yellow`) | Label and confidence |
 
-The result is the top class with no rejection threshold. A threshold block exists in the source but is commented out.
+If start-up fails (buffer allocation or I2S driver), the OLED shows `Error!` with the reason, all three LEDs turn on, and the button is ignored. The result is the top class with no rejection threshold. A threshold block exists in the source but is commented out.

@@ -7,7 +7,7 @@ Run these in order after flashing. Each step has an observable pass condition. R
 | # | Action | Pass condition |
 |---|---|---|
 | A1 | Flash `dataset_capture`, open a serial monitor at 921600 baud, reset the board | Prints `READY` |
-| A2 | Close the monitor, run `python tools/capture_audio.py`, hold SPACE and say a word | Prints `[OK] recordings/<LABEL>/<LABEL>_0000.wav` |
+| A2 | Close the monitor, run `python tools/capture_audio.py`, hold SPACE and say a word | Prints `[OK] recordings/<LABEL>/<LABEL>.0000.wav` |
 | A3 | `python tests/check_wav.py recordings/` | Every file reports `OK` (a `WARN` for silence is acceptable only for `noise`) |
 | A4 | Open one file in an audio player | The word is audible, with no loud pop at the start |
 
@@ -22,7 +22,7 @@ Run these in order after flashing. Each step has an observable pass condition. R
 | B5 | Release the button, wait 1.5 s | OLED returns to `Ready`; red LED on |
 | B6 | Stay silent while pressing | The top class is still shown, because the firmware applies no rejection threshold. Record the label and confidence you get |
 
-If the OLED stays blank, try `OLED_ADDR 0x3D`. If serial prints `ERR: I2S init failed`, check the three I2S pins against `hardware/README.md`.
+If the OLED stays blank, try `OLED_ADDR 0x3D`. If the OLED shows `Error!` and all three LEDs are on, the sketch stopped at start-up: `No RAM` means the 32 KB buffer was not allocated, `I2S init` means the microphone driver failed, so check the three I2S pins against `hardware/README.md`. The serial monitor prints the same `ERR:` line.
 
 ## Result log (fill in per board)
 

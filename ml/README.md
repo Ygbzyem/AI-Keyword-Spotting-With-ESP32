@@ -59,9 +59,9 @@ Settings: Arduino library, EON Compiler. The numbers below are Edge Impulse esti
 
 ## Reproduce
 
-1. Create an Edge Impulse project, upload the clips (see `dataset/README.md`), label by folder name, keep the 80/20 split.
+1. Create an Edge Impulse project, upload the clips (see `dataset/README.md`), keep the 80/20 split. The label is taken from the file name up to the first `.` (`hello.0000.wav` becomes `hello`), or set it in the uploader.
 2. Create the impulse with the table above, train, check the confusion matrix.
 3. Deployment tab: Arduino library, EON Compiler, Quantized (int8), Build.
-4. Put the downloaded `.zip` in `ml/edge-impulse-model/` and install it (see root README, Build and Flash).
+4. Put the downloaded `.zip` in `ml/edge-impulse-model/` and install it (see root README, Build and Flash). The exact export used for the results above is attached to the GitHub Release `v1.0.0` (details in `ml/edge-impulse-model/README.md`).
 
 If your Edge Impulse project has a different name, the generated header name changes. Rename the project to `AI_Speech_to_text` or edit the `#include` in `kws_inference.ino`.
