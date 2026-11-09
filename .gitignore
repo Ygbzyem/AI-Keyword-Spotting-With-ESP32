@@ -1,0 +1,41 @@
+# --- Arduino / PlatformIO ---
+build/
+.pio/
+.pioenvs/
+.piolibdeps/
+*.hex
+*.elf
+*.bin.orig
+
+# --- Python ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+
+# --- Dataset (large / local-only) ---
+recordings/
+dataset/raw/
+*.wav
+
+# --- Edge Impulse exports (large; add intentionally if you want to version them) ---
+ml/edge-impulse-model/*.zip
+ml/edge-impulse-model/**/*
+!ml/edge-impulse-model/.gitkeep
+!ml/edge-impulse-model/README.md
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# --- KiCad backups/locks ---
+hardware/**/*-backups/
+hardware/**/*.bak
+hardware/**/*.lck
+hardware/**/fp-info-cache
+dataset/recordings.zip
