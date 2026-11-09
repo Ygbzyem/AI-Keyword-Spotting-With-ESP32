@@ -9,12 +9,6 @@ A self-designed ESP32-WROOM-32UE board listens through an INMP441 microphone, ru
 
 Report: [EN (PDF)](docs/report/CDP301_Final_Report.pdf)
 
-<p align="center">
-  <img src="docs/images/10-demo-standby.jpg" width="30%" alt="Idle: red LED, Ready on OLED">
-  <img src="docs/images/11-demo-recording.jpg" width="30%" alt="Recording: yellow LED">
-  <img src="docs/images/12-demo-result.jpg" width="30%" alt="Result: green LED, label and confidence">
-</p>
-
 ## Project Structure
 
 ```
